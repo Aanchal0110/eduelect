@@ -7,7 +7,7 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? '/eduelect/' : '/',
   build: {
-    outDir: 'docs',
+    outDir: '../../docs',
     assetsDir: 'assets',
     emptyOutDir: true,
     rollupOptions: {
