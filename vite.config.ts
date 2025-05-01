@@ -12,14 +12,26 @@ interface ExtendedRequest extends IncomingMessage {
 export default defineConfig(({ mode }) => ({
   base: '/',
   build: {
-    outDir: 'docs',
+    outDir: 'dist',
     assetsDir: 'assets',
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        assetFileNames: 'assets/[name][extname]',
-        chunkFileNames: 'assets/[name].[hash].js',
-        entryFileNames: 'assets/[name].[hash].js',
+        assetFileNames: (assetInfo) => {
+          const fileName = assetInfo.name || '';
+          if (/\.(png|jpe?g|svg|gif|tiff|bmp|ico)$/i.test(fileName)) {
+            return `assets/images/[name]-[hash][extname]`;
+          }
+          if (/\.css$/i.test(fileName)) {
+            return `assets/css/[name]-[hash][extname]`;
+          }
+          if (/\.js$/i.test(fileName)) {
+            return `assets/js/[name]-[hash][extname]`;
+          }
+          return `assets/[name]-[hash][extname]`;
+        },
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
       },
     },
   },
