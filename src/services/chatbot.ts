@@ -1,7 +1,17 @@
 import axios from 'axios';
 
+// Define API endpoints based on environment
+const API_ENDPOINTS = {
+  COURSES: process.env.NODE_ENV === 'production' 
+    ? 'https://ansheeka.app.n8n.cloud/webhook/15e4d662-3f98-48d0-9f50-68838769ecac/chat'
+    : '/api/courses',
+  PREFERENCES: process.env.NODE_ENV === 'production'
+    ? 'https://ansheeka.app.n8n.cloud/webhook/250eb06b-049f-4d0b-a299-1af238292432/chat'
+    : '/api/preferences'
+};
+
 // Use the preferences endpoint for chat
-const chatUrl = '/api/preferences';
+const chatUrl = API_ENDPOINTS.PREFERENCES;
 
 export interface ChatMessage {
   id: number;
@@ -17,16 +27,18 @@ export const sendMessage = async (message: string): Promise<string> => {
       method: 'post',
       url: chatUrl,
       data: {
-        input: message,  // Changed from query to input
+        input: message,
         type: "chat",
         context: "course_preferences",
         format: "text"
       },
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Origin': window.location.origin,
+        'Access-Control-Allow-Origin': '*'
       },
-      timeout: 60000, // 60 second timeout
+      timeout: 60000,
       timeoutErrorMessage: 'Request timed out. Please try again.'
     });
 
