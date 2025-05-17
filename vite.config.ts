@@ -39,10 +39,47 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
     proxy: {
-      '/api/courses': {
-        target: 'https://ansheeka.app.n8n.cloud',
+      '/api/chat': {
+        target: 'https://n8n.customaistudio.io',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/courses/, '/webhook/15e4d662-3f98-48d0-9f50-68838769ecac/chat'),
+        rewrite: (path) => path.replace(/^\/api\/chat/, '/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'),
+        secure: false,
+        timeout: 60000,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          'Content-Type': 'application/json'
+        },
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req: ExtendedRequest, _res) => {
+            console.log('Sending Request to chat endpoint:', req.url);
+            if (req.body) {
+              console.log('Request body:', req.body);
+              const bodyData = JSON.stringify(req.body);
+              proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+              proxyReq.write(bodyData);
+            }
+          });
+          proxy.on('proxyRes', (proxyRes: IncomingMessage, req, _res) => {
+            console.log('Received Response from chat endpoint:', req.url, 'Status:', proxyRes.statusCode);
+            let body = '';
+            proxyRes.on('data', function(chunk) {
+              body += chunk;
+            });
+            proxyRes.on('end', function() {
+              console.log('Response body:', body);
+            });
+          });
+        }
+      },
+      '/api/courses': {
+        target: 'https://n8n.customaistudio.io',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/courses/, '/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'),
         secure: false,
         timeout: 30000,
         headers: {
@@ -63,9 +100,9 @@ export default defineConfig(({ mode }) => ({
         }
       },
       '/api/preferences': {
-        target: 'https://ansheeka.app.n8n.cloud',
+        target: 'https://n8n.customaistudio.io',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/preferences/, '/webhook/250eb06b-049f-4d0b-a299-1af238292432/chat'),
+        rewrite: (path) => path.replace(/^\/api\/preferences/, '/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'),
         secure: false,
         timeout: 60000,
         headers: {
