@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect, Fragment } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { SendHorizontal, Bot, User, Loader2 } from 'lucide-react';
+import { SendHorizontal, Bot, User, Loader2, AlertCircle } from 'lucide-react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatMessage, sendMessage } from '@/services/chatbot';
 
@@ -65,13 +65,24 @@ const ChatbotSection: React.FC<ChatbotSectionProps> = ({ initialContext, onSaveS
     setInput('');
     setIsLoading(true);
     
+    // Add temporary typing indicator
+    const typingIndicatorId = Date.now();
+    setMessages(prev => [...prev, { 
+      id: typingIndicatorId, 
+      text: "Thinking...", 
+      sender: 'bot' 
+    }]);
+    
     try {
       // Get response from n8n webhook
       const response = await sendMessage(input);
       
+      // Remove typing indicator
+      setMessages(prev => prev.filter(msg => msg.id !== typingIndicatorId));
+      
       // Add bot response
       const botMessage: ChatMessage = {
-        id: messages.length + 2,
+        id: messages.length + 3, // +1 for user message, +1 for typing indicator, +1 for this response
         text: response,
         sender: 'bot'
       };
@@ -86,10 +97,13 @@ const ChatbotSection: React.FC<ChatbotSectionProps> = ({ initialContext, onSaveS
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       setError(errorMessage);
       
+      // Remove typing indicator
+      setMessages(prev => prev.filter(msg => msg.id !== typingIndicatorId));
+      
       // Add error message to chat
       const errorBotMessage: ChatMessage = {
-        id: messages.length + 2,
-        text: errorMessage,
+        id: messages.length + 3,
+        text: `Sorry, I encountered an error: ${errorMessage}. Please try again later.`,
         sender: 'bot'
       };
       setMessages(prev => {
@@ -104,10 +118,9 @@ const ChatbotSection: React.FC<ChatbotSectionProps> = ({ initialContext, onSaveS
 
   const formatMessageText = (text: string) => {
     return text.split('\n').map((line, i) => (
-      <Fragment key={i}>
+      <span key={i} className="block">
         {line}
-        <br />
-      </Fragment>
+      </span>
     ));
   };
 
@@ -155,15 +168,19 @@ const ChatbotSection: React.FC<ChatbotSectionProps> = ({ initialContext, onSaveS
                       </>
                     )}
                   </div>
-                  <div className="whitespace-pre-wrap">{formatMessageText(message.text)}</div>
+                  <div className="whitespace-pre-wrap">
+                    {message.text === "Thinking..." ? (
+                      <div className="flex items-center gap-2">
+                        <span>{message.text}</span>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      </div>
+                    ) : (
+                      formatMessageText(message.text)
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
-            {isLoading && (
-              <div className="flex justify-center items-center py-2">
-                <Loader2 className="w-6 h-6 animate-spin text-education-primary" />
-              </div>
-            )}
             <div ref={messagesEndRef} />
           </CardContent>
         </ScrollArea>

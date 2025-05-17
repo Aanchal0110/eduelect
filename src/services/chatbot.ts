@@ -3,15 +3,20 @@ import axios from 'axios';
 // Define API endpoints based on environment
 const API_ENDPOINTS = {
   COURSES: process.env.NODE_ENV === 'production' 
-    ? 'https://ansheeka.app.n8n.cloud/webhook/15e4d662-3f98-48d0-9f50-68838769ecac/chat'
+    ? 'https://n8n.customaistudio.io/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'
     : '/api/courses',
   PREFERENCES: process.env.NODE_ENV === 'production'
-    ? 'https://ansheeka.app.n8n.cloud/webhook/250eb06b-049f-4d0b-a299-1af238292432/chat'
-    : '/api/preferences'
+    ? 'https://n8n.customaistudio.io/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'
+    : '/api/preferences',
+  CHAT: process.env.NODE_ENV === 'production'
+    ? 'https://n8n.customaistudio.io/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'
+    : '/api/chat'
 };
 
-// Use the preferences endpoint for chat
-const chatUrl = API_ENDPOINTS.PREFERENCES;
+// Use direct URL in development for testing
+const chatUrl = process.env.NODE_ENV === 'development' 
+  ? 'https://n8n.customaistudio.io/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat' 
+  : API_ENDPOINTS.CHAT;
 
 export interface ChatMessage {
   id: number;
@@ -21,22 +26,17 @@ export interface ChatMessage {
 
 export const sendMessage = async (message: string): Promise<string> => {
   try {
-    console.log('Sending message to chat endpoint:', { message });
+    console.log('Sending message to chat endpoint:', { message, url: chatUrl });
     
     const response = await axios({
       method: 'post',
       url: chatUrl,
       data: {
-        input: message,
-        type: "chat",
-        context: "course_preferences",
-        format: "text"
+        message: message
       },
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Origin': window.location.origin,
-        'Access-Control-Allow-Origin': '*'
+        'Accept': 'application/json'
       },
       timeout: 60000,
       timeoutErrorMessage: 'Request timed out. Please try again.'
@@ -52,6 +52,9 @@ export const sendMessage = async (message: string): Promise<string> => {
           const parsed = JSON.parse(response.data);
           if (parsed.output) {
             return parsed.output.replace(/\\n/g, '\n');
+          }
+          if (parsed.response) {
+            return parsed.response.replace(/\\n/g, '\n');
           }
           return response.data;
         } catch {
