@@ -3,19 +3,19 @@ import axios from 'axios';
 // Define API endpoints based on environment
 const API_ENDPOINTS = {
   COURSES: process.env.NODE_ENV === 'production' 
-    ? 'https://n8n.customaistudio.io/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'
+    ? 'https://anshiikka.app.n8n.cloud/webhook/250eb06b-049f-4d0b-a299-1af238292432/chat'
     : '/api/courses',
   PREFERENCES: process.env.NODE_ENV === 'production'
-    ? 'https://n8n.customaistudio.io/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'
+    ? 'https://anshiikka.app.n8n.cloud/webhook/15e4d662-3f98-48d0-9f50-68838769ecac/chat'
     : '/api/preferences',
   CHAT: process.env.NODE_ENV === 'production'
-    ? 'https://n8n.customaistudio.io/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'
+    ? 'https://anshiikka.app.n8n.cloud/webhook/15e4d662-3f98-48d0-9f50-68838769ecac/chat'
     : '/api/chat'
 };
 
 // Use direct URL in development for testing
 const chatUrl = process.env.NODE_ENV === 'development' 
-  ? 'https://n8n.customaistudio.io/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat' 
+  ? 'https://anshiikka.app.n8n.cloud/webhook/250eb06b-049f-4d0b-a299-1af238292432/chat' 
   : API_ENDPOINTS.CHAT;
 
 export interface ChatMessage {

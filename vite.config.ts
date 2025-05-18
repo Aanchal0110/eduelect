@@ -77,7 +77,7 @@ export default defineConfig(({ mode }) => ({
         }
       },
       '/api/courses': {
-        target: 'https://n8n.customaistudio.io',
+        target: 'https://anshiikka.app.n8n.cloud/webhook/250eb06b-049f-4d0b-a299-1af238292432/chat',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/courses/, '/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'),
         secure: false,
@@ -100,7 +100,7 @@ export default defineConfig(({ mode }) => ({
         }
       },
       '/api/preferences': {
-        target: 'https://n8n.customaistudio.io',
+        target: '//anshiikka.app.n8n.cloud/webhook/15e4d662-3f98-48d0-9f50-68838769ecac/chat ',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/preferences/, '/webhook/ab874568-b62d-4b5e-b744-efedb9936227/chat'),
         secure: false,
